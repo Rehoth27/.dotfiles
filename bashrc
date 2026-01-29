@@ -61,7 +61,6 @@ alias lls='eza --icons=always --color=always --group-directories-first \
 
 # Shortcuts alias
 alias cln="clear"     #cleans contents in terminal  
-alias tmx="tmux"      #opens tmux a sesh
 alias rm="rm -i"      # safer rm (interactive)
 alias x="exit"        #Closes terminal   
 alias slp="systemctl suspend"  #Sleep
@@ -75,10 +74,6 @@ alias grep='grep --color=auto'
 ################################################################################
 # FUNCTIONS
 ################################################################################
-# Append quick notes with timestamps to ~/notes.txt
-note() { 
-    echo "$(date): $@" >> ~/notes.txt
-}
 
 # Safer shutdown with confirmation
 shut() {

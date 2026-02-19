@@ -60,7 +60,7 @@ alias lls='eza --icons=always --color=always --group-directories-first \
             --all --long --no-permissions --no-filesize --no-user --no-time'
 
 # Shortcuts alias
-alias cln="clear"     #cleans contents in terminal  
+alias c="clear"     #cleans contents in terminal  
 alias rm="rm -i"      # safer rm (interactive)
 alias x="exit"        #Closes terminal   
 alias slp="systemctl suspend"  #Sleep

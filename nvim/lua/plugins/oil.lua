@@ -2,13 +2,21 @@ return {
 	"stevearc/oil.nvim",
 	dependencies = { "nvim-tree/nvim-web-devicons" },
 
+	keys = {
+		{
+			"-",
+			function()
+				require("oil").open()
+			end,
+			desc = "Open Oil file explorer",
+		},
+	},
+
 	config = function()
 		require("oil").setup({
 			default_file_explorer = true,
 
-			columns = {
-				"icon",
-			},
+			columns = { "icon" },
 
 			buf_options = {
 				buflisted = false,
@@ -41,48 +49,41 @@ return {
 			watch_for_changes = false,
 
 			keymaps = {
-				["g?"] = { "actions.show_help", mode = "n" },
+				["g?"] = "actions.show_help",
 				["<CR>"] = "actions.select",
 				["<C-s>"] = { "actions.select", opts = { vertical = true } },
 				["<C-h>"] = { "actions.select", opts = { horizontal = true } },
 				["<C-t>"] = { "actions.select", opts = { tab = true } },
 				["<C-p>"] = "actions.preview",
-				["<C-c>"] = { "actions.close", mode = "n" },
+				["<C-c>"] = "actions.close",
 				["<C-l>"] = "actions.refresh",
-				["-"] = { "actions.parent", mode = "n" },
-				["_"] = { "actions.open_cwd", mode = "n" },
-				["`"] = { "actions.cd", mode = "n" },
-				["g~"] = { "actions.cd", opts = { scope = "tab" }, mode = "n" },
-				["gs"] = { "actions.change_sort", mode = "n" },
+				["-"] = "actions.parent",
+				["_"] = "actions.open_cwd",
+				["`"] = "actions.cd",
+				["g~"] = { "actions.cd", opts = { scope = "tab" } },
+				["gs"] = "actions.change_sort",
 				["gx"] = "actions.open_external",
-				["g."] = { "actions.toggle_hidden", mode = "n" },
-				["g\\"] = { "actions.toggle_trash", mode = "n" },
+				["g."] = "actions.toggle_hidden",
+				["g\\"] = "actions.toggle_trash",
 			},
 
 			use_default_keymaps = true,
 
 			view_options = {
 				show_hidden = false,
-
 				is_hidden_file = function(name)
 					return name:match("^%.") ~= nil
 				end,
-
 				is_always_hidden = function()
 					return false
 				end,
-
 				natural_order = "fast",
 				case_insensitive = false,
-
 				sort = {
 					{ "type", "asc" },
 					{ "name", "asc" },
 				},
 			},
 		})
-
-		-- 🔥 GLOBAL KEYMAP (THIS WAS MISSING)
-		vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open Oil" })
 	end,
 }

@@ -80,68 +80,9 @@ return {
 					{ "name", "asc" },
 				},
 			},
-
-			git = {
-				add = function()
-					return false
-				end,
-				mv = function()
-					return false
-				end,
-				rm = function()
-					return false
-				end,
-			},
-
-			float = {
-				padding = 2,
-				max_width = 0,
-				max_height = 0,
-				border = nil,
-				win_options = {
-					winblend = 0,
-				},
-			},
-
-			preview_win = {
-				update_on_cursor_moved = true,
-				preview_method = "fast_scratch",
-				disable_preview = function()
-					return false
-				end,
-				win_options = {},
-			},
-
-			confirmation = {
-				max_width = 0.9,
-				min_width = { 40, 0.4 },
-				max_height = 0.9,
-				min_height = { 5, 0.1 },
-				border = nil,
-				win_options = {
-					winblend = 0,
-				},
-			},
-
-			progress = {
-				max_width = 0.9,
-				min_width = { 40, 0.4 },
-				max_height = { 10, 0.9 },
-				min_height = { 5, 0.1 },
-				border = nil,
-				minimized_border = "none",
-				win_options = {
-					winblend = 0,
-				},
-			},
-
-			ssh = {
-				border = nil,
-			},
-
-			keymaps_help = {
-				border = nil,
-			},
 		})
+
+		-- 🔥 GLOBAL KEYMAP (THIS WAS MISSING)
+		vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open Oil" })
 	end,
 }

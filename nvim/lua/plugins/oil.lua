@@ -1,89 +1,56 @@
 return {
-	"stevearc/oil.nvim",
-	dependencies = { "nvim-tree/nvim-web-devicons" },
 
-	keys = {
-		{
-			"-",
-			function()
-				require("oil").open()
-			end,
-			desc = "Open Oil file explorer",
-		},
+	{
+		"folke/tokyonight.nvim",
+		priority = 1000,
+		config = function()
+			require("tokyonight").setup({
+				style = "storm",
+				transparent = false,
+				terminal_colors = true,
+			})
+			vim.cmd.colorscheme("tokyonight")
+		end,
 	},
 
-	config = function()
-		require("oil").setup({
-			default_file_explorer = true,
+	{
+		"stevearc/oil.nvim",
+		dependencies = { "nvim-tree/nvim-web-devicons" },
 
-			columns = { "icon" },
-
-			buf_options = {
-				buflisted = false,
-				bufhidden = "hide",
-			},
-
-			win_options = {
-				wrap = false,
-				signcolumn = "no",
-				cursorcolumn = false,
-				foldcolumn = "0",
-				spell = false,
-				list = false,
-				conceallevel = 3,
-				concealcursor = "nvic",
-			},
-
-			delete_to_trash = false,
-			skip_confirm_for_simple_edits = false,
-			prompt_save_on_select_new_entry = true,
-			cleanup_delay_ms = 2000,
-
-			lsp_file_methods = {
-				enabled = true,
-				timeout_ms = 1000,
-				autosave_changes = false,
-			},
-
-			constrain_cursor = "editable",
-			watch_for_changes = false,
-
-			keymaps = {
-				["g?"] = "actions.show_help",
-				["<CR>"] = "actions.select",
-				["<C-s>"] = { "actions.select", opts = { vertical = true } },
-				["<C-h>"] = { "actions.select", opts = { horizontal = true } },
-				["<C-t>"] = { "actions.select", opts = { tab = true } },
-				["<C-p>"] = "actions.preview",
-				["<C-c>"] = "actions.close",
-				["<C-l>"] = "actions.refresh",
-				["-"] = "actions.parent",
-				["_"] = "actions.open_cwd",
-				["`"] = "actions.cd",
-				["g~"] = { "actions.cd", opts = { scope = "tab" } },
-				["gs"] = "actions.change_sort",
-				["gx"] = "actions.open_external",
-				["g."] = "actions.toggle_hidden",
-				["g\\"] = "actions.toggle_trash",
-			},
-
-			use_default_keymaps = true,
-
-			view_options = {
-				show_hidden = false,
-				is_hidden_file = function(name)
-					return name:match("^%.") ~= nil
+		keys = {
+			{
+				"-",
+				function()
+					require("oil").open()
 				end,
-				is_always_hidden = function()
-					return false
-				end,
-				natural_order = "fast",
-				case_insensitive = false,
-				sort = {
-					{ "type", "asc" },
-					{ "name", "asc" },
+				desc = "Open Oil file explorer",
+			},
+		},
+
+		config = function()
+			require("oil").setup({
+				default_file_explorer = true,
+
+				win_options = {
+					wrap = false,
+					signcolumn = "no",
+					cursorcolumn = false,
+					cursorline = true,
+					foldcolumn = "0",
+					spell = false,
+					list = false,
+					conceallevel = 3,
+					concealcursor = "nvic",
 				},
-			},
-		})
-	end,
+			})
+
+			vim.api.nvim_create_autocmd("FileType", {
+				pattern = "oil",
+				callback = function()
+					vim.api.nvim_set_hl(0, "CursorLine", { bg = "#1f2335" })
+					vim.api.nvim_set_hl(0, "Directory", { fg = "#7dcfff", bold = true })
+				end,
+			})
+		end,
+	},
 }

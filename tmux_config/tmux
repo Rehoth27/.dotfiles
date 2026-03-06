@@ -1,51 +1,199 @@
-# -------------------------
-# Tmux Config by Rohith
-# -------------------------
 
-# Prefix key (use Ctrl+a instead of default Ctrl+b)
+# =========================================================
+#   tmux.conf — Enhanced Config by Rohith
+#   Improved: navigation, splits, copy-mode, visuals, UX
+# =========================================================
+
+# ---------------------------------------------------------
+# CORE SETTINGS
+# ---------------------------------------------------------
+
+# Prefix: Ctrl+a (more ergonomic than Ctrl+b)
 set -g prefix C-a
 unbind C-b
 bind C-a send-prefix
 
-# Enable mouse support
+# Enable mouse: click to select pane/window, resize panes, scroll
 set -g mouse on
 
-# Clipboard (only works in tmux >= 3.2, safe fallback otherwise)
+# System clipboard integration (tmux >= 3.2)
 set -g set-clipboard on
 
-# History limit
-set -g history-limit 10000
+# Large scrollback buffer
+set -g history-limit 50000
 
-# Status bar at bottom
+# Reduce escape-key delay (fixes issues in Vim/Neovim)
+set -sg escape-time 10
+
+# Start window and pane numbering at 1 (easier keyboard reach)
+set -g base-index 1
+setw -g pane-base-index 1
+
+# Renumber windows automatically when one is closed
+set -g renumber-windows on
+
+# Automatically rename windows to the running program
+setw -g automatic-rename on
+
+# Enable 256-color + true color support
+set -g default-terminal "tmux-256color"
+set -ga terminal-overrides ",xterm-256color:Tc"
+
+# Focus events (helps editors like Vim know when window is active)
+set -g focus-events on
+
+# ---------------------------------------------------------
+# KEYBINDINGS
+# ---------------------------------------------------------
+
+# Reload config with prefix + r (shows confirmation)
+bind r source-file ~/.tmux.conf \; display-message "✓ Config reloaded"
+
+# Open new windows/panes in the same directory as current pane
+bind c new-window -c "#{pane_current_path}"
+
+# Intuitive splits: | for vertical, - for horizontal (same dir)
+bind | split-window -h -c "#{pane_current_path}"
+bind - split-window -v -c "#{pane_current_path}"
+unbind '"'
+unbind %
+
+# Vim-style pane navigation (no prefix needed after first jump)
+bind -n M-h select-pane -L   # Alt+h → left
+bind -n M-j select-pane -D   # Alt+j → down
+bind -n M-k select-pane -U   # Alt+k → up
+bind -n M-l select-pane -R   # Alt+l → right
+
+# Also support arrow keys with prefix
+bind h select-pane -L
+bind j select-pane -D
+bind k select-pane -U
+bind l select-pane -R
+
+# Resize panes with prefix + Shift+arrow (repeatable)
+bind -r H resize-pane -L 5
+bind -r J resize-pane -D 5
+bind -r K resize-pane -U 5
+bind -r L resize-pane -R 5
+
+# Zoom pane toggle: prefix + z (built-in, just a reminder)
+# prefix + z → zoom/unzoom current pane
+
+# Session switching: Alt+number (no prefix needed)
+bind -n M-1 switch-client -t 1
+bind -n M-2 switch-client -t 2
+bind -n M-3 switch-client -t 3
+bind -n M-4 switch-client -t 4
+bind -n M-5 switch-client -t 5
+
+# Window switching: prefix + number (keep this for window nav)
+bind 1 select-window -t 1
+bind 2 select-window -t 2
+bind 3 select-window -t 3
+bind 4 select-window -t 4
+bind 5 select-window -t 5
+
+# Swap windows left/right
+bind -r < swap-window -d -t -1
+bind -r > swap-window -d -t +1
+
+# Kill pane/window without confirmation prompt
+bind x kill-pane
+bind X kill-window
+
+# Quick new session
+bind N new-session
+
+# ---------------------------------------------------------
+# COPY MODE (Vim keybindings)
+# ---------------------------------------------------------
+
+setw -g mode-keys vi
+
+# Enter copy mode with prefix + v (feels natural)
+bind v copy-mode
+
+# In copy mode: v to start selection, y to yank
+bind -T copy-mode-vi v send-keys -X begin-selection
+bind -T copy-mode-vi y send-keys -X copy-pipe-and-cancel "xclip -in -selection clipboard 2>/dev/null || pbcopy 2>/dev/null || wl-copy 2>/dev/null || true"
+bind -T copy-mode-vi r send-keys -X rectangle-toggle
+bind -T copy-mode-vi Escape send-keys -X cancel
+
+# Paste with prefix + p
+bind p paste-buffer
+
+# ---------------------------------------------------------
+# STATUS BAR
+# ---------------------------------------------------------
+
 set -g status-position bottom
-
-# background with subtle text
-set -g status-style bg=colour236,fg=colour250
-
-# Left side: session + window
-set -g status-left '#[fg=colour38,bold]#S #[fg=colour250]#I:#W#F '
-
-# Right side: time + date
-set -g status-right '#[fg=colour36,bold] %H:%M:%S #[fg=colour37] %d %b %Y '
 set -g status-interval 1
+set -g status-justify left
 
-# Window title styling
-setw -g window-status-format '#[fg=colour244] #I:#W '
-setw -g window-status-current-format '#[fg=colour46,bold] #I:#W '
+# Overall status bar colors
+set -g status-style bg=colour234,fg=colour250
 
-# Pane border colors
-set -g pane-border-style fg=colour238
-set -g pane-active-border-style fg=colour39
+# Left: session name + window name
+set -g status-left-length 40
+set -g status-left '#[fg=colour39,bold,bg=colour237] ❐ #S #[fg=colour250,bg=colour234] '
 
-# Message styling (like prompts)
-set -g message-style bg=colour39,fg=black
+# Right: CPU feel (user@host) + time + date
+set -g status-right-length 60
+set -g status-right '#[fg=colour244] #(whoami)@#h #[fg=colour238]│#[fg=colour36,bold] %H:%M:%S #[fg=colour238]│#[fg=colour37] %a %d %b %Y '
 
-# -------------------------
-# Plugins (via TPM)
-# -------------------------
+# Inactive window tabs
+setw -g window-status-format '#[fg=colour240,bg=colour234]  #I:#W#F '
+
+# Active window tab (highlighted)
+setw -g window-status-current-format '#[fg=colour39,bold,bg=colour237]  #I:#W#F '
+
+# ---------------------------------------------------------
+# PANE STYLING
+# ---------------------------------------------------------
+
+# Inactive pane border
+set -g pane-border-style fg=colour237,bg=default
+
+# Active pane border (bright teal accent)
+set -g pane-active-border-style fg=colour39,bg=default
+
+# Dim inactive panes slightly (helps focus)
+setw -g window-style fg=colour245,bg=colour233
+setw -g window-active-style fg=colour252,bg=colour232
+
+# ---------------------------------------------------------
+# MESSAGES & POPUPS
+# ---------------------------------------------------------
+
+# Command prompt / message bar
+set -g message-style bg=colour39,fg=colour232,bold
+set -g message-command-style bg=colour237,fg=colour39
+
+# ---------------------------------------------------------
+# ACTIVITY MONITORING
+# ---------------------------------------------------------
+
+# Highlight windows with activity in the status bar
+setw -g monitor-activity on
+set -g visual-activity off   # No annoying bell — just visual highlight
+
+# ---------------------------------------------------------
+# PLUGINS (via TPM)
+# ---------------------------------------------------------
+
 set -g @plugin 'tmux-plugins/tpm'
 set -g @plugin 'tmux-plugins/tmux-sensible'
+set -g @plugin 'tmux-plugins/tmux-resurrect'    # Save/restore sessions (prefix + Ctrl+s / Ctrl+r)
+set -g @plugin 'tmux-plugins/tmux-continuum'    # Auto-save sessions every 15 min
+set -g @plugin 'tmux-plugins/tmux-yank'         # Better clipboard yank support
 
-# Initialize TPM (keep this line at the very bottom of tmux.conf!)
+# tmux-continuum: auto-restore last session on tmux start
+set -g @continuum-restore 'on'
+
+# tmux-resurrect: also restore pane contents
+set -g @resurrect-capture-pane-contents 'on'
+
+# =========================================================
+# Initialize TPM — MUST be the last line
+# =========================================================
 run '~/.tmux/plugins/tpm/tpm'
-
